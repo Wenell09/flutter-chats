@@ -80,10 +80,10 @@ class RoomChatView extends GetView<RoomChatController> {
                           itemBuilder: (context, index) {
                             var isSender =
                                 chat[index]["pengirim"] == controller.emailUser;
+                            var isRead = chat[index]["isRead"] == true;
                             return Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 15,
-                                vertical: 15,
                               ),
                               child: Align(
                                 alignment: (isSender)
@@ -94,12 +94,15 @@ class RoomChatView extends GetView<RoomChatController> {
                                       ? CrossAxisAlignment.end
                                       : CrossAxisAlignment.start,
                                   children: [
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
                                     Container(
-                                      padding: const EdgeInsets.all(15),
+                                      padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                         color: (isSender)
                                             ? Colors.orange
-                                            : Colors.grey,
+                                            : Colors.black26,
                                         borderRadius: (isSender)
                                             ? const BorderRadius.only(
                                                 topLeft: Radius.circular(15),
@@ -113,13 +116,62 @@ class RoomChatView extends GetView<RoomChatController> {
                                                     Radius.circular(15),
                                               ),
                                       ),
-                                      child: Text(chat[index]["pesan"]),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            chat[index]["pesan"],
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: (isSender)
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                controller.formatTime(
+                                                    chat[index]["time"]),
+                                                style: TextStyle(
+                                                  color: (isSender)
+                                                      ? Colors.white
+                                                      : Colors.black,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              (isSender)
+                                                  ? (isRead)
+                                                      ? const Icon(
+                                                          Icons.check,
+                                                          color: Colors.blue,
+                                                          size: 20,
+                                                        )
+                                                      : const Icon(
+                                                          Icons.check,
+                                                          size: 20,
+                                                        )
+                                                  : Container()
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(controller
-                                        .formatTime(chat[index]["time"])),
+                                    (isSender)
+                                        ? const SizedBox(
+                                            height: 5,
+                                          )
+                                        : const SizedBox(
+                                            height: 10,
+                                          ),
                                   ],
                                 ),
                               ),

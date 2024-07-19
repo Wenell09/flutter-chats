@@ -79,18 +79,23 @@ class HomeView extends GetView<HomeController> {
                                   ConnectionState.active) {
                                 var connection = snapshot2.data!.data();
                                 return InkWell(
-                                  onTap: () => Navigator.of(context).pushNamed(
-                                    Routes.ROOM_CHAT,
-                                    arguments: {
-                                      "chatId": userChat[index]["chats_id"],
-                                      "emailUser": controller.email,
-                                      "nameTarget": connection["name"],
-                                      "statusTarget": connection["status"],
-                                      "photoTarget": connection["photoUrl"],
-                                      "emailTarget": userChat[index]
-                                          ["connection"],
-                                    },
-                                  ),
+                                  onTap: () {
+                                    controller.readChat(
+                                        userChat[index]["chats_id"],
+                                        userChat[index]["connection"]);
+                                    Navigator.of(context).pushNamed(
+                                      Routes.ROOM_CHAT,
+                                      arguments: {
+                                        "chatId": userChat[index]["chats_id"],
+                                        "emailUser": controller.email,
+                                        "nameTarget": connection["name"],
+                                        "statusTarget": connection["status"],
+                                        "photoTarget": connection["photoUrl"],
+                                        "emailTarget": userChat[index]
+                                            ["connection"],
+                                      },
+                                    );
+                                  },
                                   child: SizedBox(
                                     height: 70,
                                     child: Row(
@@ -129,7 +134,78 @@ class HomeView extends GetView<HomeController> {
                                                   fontSize: 16,
                                                 ),
                                               ),
-                                              Text(connection["status"]),
+                                              StreamBuilder<
+                                                      DocumentSnapshot<
+                                                          Map<String,
+                                                              dynamic>>>(
+                                                  stream:
+                                                      controller.streamChatView(
+                                                          userChat[index]
+                                                              ["chats_id"]),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.hasData &&
+                                                        snapshot.data!.data() !=
+                                                            null) {
+                                                      var chat =
+                                                          (snapshot.data!.data()
+                                                                  as Map<String,
+                                                                      dynamic>)[
+                                                              "chat"] as List;
+
+                                                      chat.sort((a, b) =>
+                                                          b["time"].compareTo(
+                                                              a["time"]));
+                                                      if (chat.isEmpty) {
+                                                        return Container();
+                                                      } else {
+                                                        var isRead = chat[index]
+                                                                ["isRead"] ==
+                                                            true;
+                                                        return Row(
+                                                          children: [
+                                                            (chat.isEmpty)
+                                                                ? const Text("")
+                                                                : (isRead)
+                                                                    ? const Icon(
+                                                                        Icons
+                                                                            .check,
+                                                                        color: Colors
+                                                                            .blue,
+                                                                        size:
+                                                                            20,
+                                                                      )
+                                                                    : const Icon(
+                                                                        Icons
+                                                                            .check,
+                                                                        size:
+                                                                            20,
+                                                                      ),
+                                                            const SizedBox(
+                                                              width: 2,
+                                                            ),
+                                                            Flexible(
+                                                              child: (chat
+                                                                      .isEmpty)
+                                                                  ? const Text(
+                                                                      "")
+                                                                  : Text(
+                                                                      chat[index]
+                                                                          [
+                                                                          "pesan"],
+                                                                      maxLines:
+                                                                          1,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                    ),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      }
+                                                    } else {
+                                                      return Container();
+                                                    }
+                                                  }),
                                             ],
                                           ),
                                         ),

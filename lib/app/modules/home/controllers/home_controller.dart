@@ -41,6 +41,41 @@ class HomeController extends GetxController {
     }
   }
 
+  readChat(String chatId, String emailTarget) async {
+    CollectionReference users = firebaseFirestore.collection("users");
+    CollectionReference chats = firebaseFirestore.collection("chats");
+    final chatDoc = await chats.doc(chatId).get();
+    // Ambil data dari dokumen chat
+    final data = chatDoc.data() as Map<String, dynamic>;
+    // Ambil list chat
+    List<dynamic> chatList = data['chat'];
+    // Update field isRead pada elemen yang sesuai
+    List<Map<String, dynamic>> updatedChatList = chatList.map((item) {
+      final chatItem = item as Map<String, dynamic>;
+      if (chatItem['isRead'] == false && chatItem['penerima'] == email) {
+        return {...chatItem, 'isRead': true};
+      }
+      return chatItem;
+    }).toList();
+
+    // Perbarui dokumen dengan list yang telah diubah
+    await chats.doc(chatId).update({'chat': updatedChatList});
+    await users.doc(email).update({
+      "chats": [
+        {
+          "connection": emailTarget,
+          "chats_id": chatId,
+          "total_unread": 0,
+          "last_time": DateTime.now().toIso8601String(),
+        }
+      ],
+    });
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> streamChatView(
+          String chatId) =>
+      firebaseFirestore.collection("chats").doc(chatId).snapshots();
+
   @override
   void onInit() {
     savePhoto();
