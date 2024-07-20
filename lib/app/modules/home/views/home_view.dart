@@ -63,7 +63,7 @@ class HomeView extends GetView<HomeController> {
                 var userChat = (snapshot.data!.data()
                     as Map<String, dynamic>)["chats"] as List;
                 userChat
-                    .sort((a, b) => a["last_time"].compareTo(b["last_time"]));
+                    .sort((a, b) => b["last_time"].compareTo(a["last_time"]));
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -150,21 +150,17 @@ class HomeView extends GetView<HomeController> {
                                                                   as Map<String,
                                                                       dynamic>)[
                                                               "chat"] as List;
-
-                                                      chat.sort((a, b) =>
-                                                          b["time"].compareTo(
-                                                              a["time"]));
                                                       if (chat.isEmpty) {
                                                         return const Text("");
                                                       } else {
-                                                        var isRead = chat[index]
-                                                                ["isRead"] ==
+                                                        var isRead = chat.last[
+                                                                "isRead"] ==
                                                             true;
                                                         return Row(
                                                           children: [
                                                             (chat.isEmpty)
                                                                 ? const Text("")
-                                                                : (chat[index][
+                                                                : (chat.last[
                                                                             "pengirim"] ==
                                                                         controller
                                                                             .email)
@@ -192,8 +188,7 @@ class HomeView extends GetView<HomeController> {
                                                                   ? const Text(
                                                                       "")
                                                                   : Text(
-                                                                      chat[index]
-                                                                          [
+                                                                      chat.last[
                                                                           "pesan"],
                                                                       maxLines:
                                                                           1,
@@ -212,58 +207,80 @@ class HomeView extends GetView<HomeController> {
                                             ],
                                           ),
                                         ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 13),
-                                          child: Center(
-                                            child: (userChat[index]
-                                                        ["total_unread"] ==
-                                                    0)
-                                                ? Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Text(controller
-                                                          .formatDateTime(
-                                                              userChat[index][
-                                                                  "last_time"])),
-                                                      Container(
-                                                        height: 15,
+                                        StreamBuilder<
+                                            DocumentSnapshot<
+                                                Map<String, dynamic>>>(
+                                          stream: controller.streamChatView(
+                                              userChat[index]["chats_id"]),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasData &&
+                                                snapshot.data!.data() != null) {
+                                              var chat = (snapshot.data!.data()
+                                                      as Map<String, dynamic>)[
+                                                  "chat"] as List;
+                                              return (chat.isEmpty)
+                                                  ? const Text("")
+                                                  : Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 13),
+                                                      child: Center(
+                                                        child: (userChat[index][
+                                                                    "total_unread"] ==
+                                                                0)
+                                                            ? Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Text(controller
+                                                                      .formatDateTime(
+                                                                          chat.last[
+                                                                              "time"])),
+                                                                  Container(
+                                                                    height: 15,
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            : Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .end,
+                                                                children: [
+                                                                  Text(controller
+                                                                      .formatDateTime(
+                                                                          chat.last[
+                                                                              "time"])),
+                                                                  const SizedBox(
+                                                                    height: 5,
+                                                                  ),
+                                                                  CircleAvatar(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .orange,
+                                                                    radius: 12,
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Text(
+                                                                        "${userChat[index]["total_unread"]}",
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                13),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
                                                       ),
-                                                    ],
-                                                  )
-                                                : Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    children: [
-                                                      Text(controller
-                                                          .formatDateTime(
-                                                              userChat[index][
-                                                                  "last_time"])),
-                                                      const SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      CircleAvatar(
-                                                        backgroundColor:
-                                                            Colors.orange,
-                                                        radius: 12,
-                                                        child: Center(
-                                                          child: Text(
-                                                            "${userChat[index]["total_unread"]}",
-                                                            style:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        13),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                          ),
+                                                    );
+                                            } else {
+                                              return Container();
+                                            }
+                                          },
                                         )
                                       ],
                                     ),

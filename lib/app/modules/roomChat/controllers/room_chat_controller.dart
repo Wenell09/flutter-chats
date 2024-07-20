@@ -41,25 +41,30 @@ class RoomChatController extends GetxController {
     // Ambil data target untuk mendapatkan nilai total_unread saat ini
     DocumentSnapshot targetUserDoc = await users.doc(emailTarget).get();
     int totalUnread = 0;
+    List<dynamic> updatedChats = [];
     if (targetUserDoc.exists) {
       List<dynamic> targetUserChats = targetUserDoc['chats'];
       for (var chat in targetUserChats) {
         if (chat['chats_id'] == chatId) {
           totalUnread = chat['total_unread'] + 1;
-          break;
+          chat['total_unread'] = totalUnread;
+          chat['last_time'] = DateTime.now().toIso8601String();
         }
+        updatedChats.add(chat);
       }
+    }
+    // jika chat_id tidak ditemukan dalam array, tambahkan koneksi baru
+    if (updatedChats.every((chat) => chat['chats_id'] != chatId)) {
+      updatedChats.add({
+        "connection": emailUsers,
+        "chats_id": chatId,
+        "total_unread": 1,
+        "last_time": DateTime.now().toIso8601String(),
+      });
     }
     // update data target
     await users.doc(emailTarget).update({
-      "chats": [
-        {
-          "connection": emailUser,
-          "chats_id": chatId,
-          "total_unread": totalUnread,
-          "last_time": DateTime.now().toIso8601String(),
-        }
-      ],
+      "chats": updatedChats,
     });
   }
 
