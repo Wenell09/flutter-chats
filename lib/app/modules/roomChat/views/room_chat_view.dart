@@ -1,4 +1,6 @@
 // ignore_for_file: deprecated_member_use
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +78,12 @@ class RoomChatView extends GetView<RoomChatController> {
                       if (snapshot.hasData && snapshot.data!.data() != null) {
                         var chat = (snapshot.data!.data()
                             as Map<String, dynamic>)["chat"] as List;
+                        Timer(
+                            Duration.zero,
+                            () => controller.scrollController.jumpTo(controller
+                                .scrollController.position.maxScrollExtent));
                         return ListView.builder(
+                          controller: controller.scrollController,
                           itemBuilder: (context, index) {
                             var isSender =
                                 chat[index]["pengirim"] == controller.emailUser;
@@ -97,6 +104,28 @@ class RoomChatView extends GetView<RoomChatController> {
                                     const SizedBox(
                                       height: 10,
                                     ),
+                                    (index == 0)
+                                        ? Center(
+                                            child: Text(
+                                              controller.formatDateTime(
+                                                  chat[index]["time"]),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          )
+                                        : (chat[index]["groupTime"] ==
+                                                chat[index - 1]["groupTime"])
+                                            ? const Center()
+                                            : Center(
+                                                child: Text(
+                                                  controller.formatDateTime(
+                                                      chat[index]["time"]),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
                                     Container(
                                       padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(

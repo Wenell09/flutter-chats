@@ -62,7 +62,6 @@ class HomeView extends GetView<HomeController> {
               if (snapshot.hasData && snapshot.data!.data() != null) {
                 var userChat = (snapshot.data!.data()
                     as Map<String, dynamic>)["chats"] as List;
-                // Urutkan userChat berdasarkan timestamp pesan masuk
                 userChat
                     .sort((a, b) => a["last_time"].compareTo(b["last_time"]));
                 return ListView.builder(
@@ -156,7 +155,7 @@ class HomeView extends GetView<HomeController> {
                                                           b["time"].compareTo(
                                                               a["time"]));
                                                       if (chat.isEmpty) {
-                                                        return Container();
+                                                        return const Text("");
                                                       } else {
                                                         var isRead = chat[index]
                                                                 ["isRead"] ==
@@ -165,21 +164,25 @@ class HomeView extends GetView<HomeController> {
                                                           children: [
                                                             (chat.isEmpty)
                                                                 ? const Text("")
-                                                                : (isRead)
-                                                                    ? const Icon(
-                                                                        Icons
-                                                                            .check,
-                                                                        color: Colors
-                                                                            .blue,
-                                                                        size:
-                                                                            20,
-                                                                      )
-                                                                    : const Icon(
-                                                                        Icons
-                                                                            .check,
-                                                                        size:
-                                                                            20,
-                                                                      ),
+                                                                : (chat[index][
+                                                                            "pengirim"] ==
+                                                                        controller
+                                                                            .email)
+                                                                    ? (isRead)
+                                                                        ? const Icon(
+                                                                            Icons.check,
+                                                                            color:
+                                                                                Colors.blue,
+                                                                            size:
+                                                                                20,
+                                                                          )
+                                                                        : const Icon(
+                                                                            Icons.check,
+                                                                            size:
+                                                                                20,
+                                                                          )
+                                                                    : const Text(
+                                                                        ""),
                                                             const SizedBox(
                                                               width: 2,
                                                             ),

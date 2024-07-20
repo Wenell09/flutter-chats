@@ -16,7 +16,8 @@ class IntroductionView extends GetView<IntroductionController> {
       pages: [
         PageViewModel(
           title: "Temukan teman baru",
-          body: "Temukan teman barumu dengan aplikasi ini.",
+          body:
+              "Temukan teman barumu dan berinteraksi dengan mereka tanpa menambahkan daftar teman",
           image: Center(
             child: Lottie.asset("assets/intro1.json", width: 300, height: 300),
           ),

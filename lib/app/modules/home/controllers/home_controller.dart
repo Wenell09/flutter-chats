@@ -58,6 +58,14 @@ class HomeController extends GetxController {
       return chatItem;
     }).toList();
 
+    // Dapatkan nilai time dari item terakhir di list chat
+    // ignore: prefer_typing_uninitialized_variables
+    var lastTime;
+    if (chatList.isNotEmpty) {
+      final lastChatItem = chatList.last as Map<String, dynamic>;
+      lastTime = lastChatItem['time'];
+    }
+
     // Perbarui dokumen dengan list yang telah diubah
     await chats.doc(chatId).update({'chat': updatedChatList});
     await users.doc(email).update({
@@ -66,7 +74,7 @@ class HomeController extends GetxController {
           "connection": emailTarget,
           "chats_id": chatId,
           "total_unread": 0,
-          "last_time": DateTime.now().toIso8601String(),
+          "last_time": lastTime ?? DateTime.now().toIso8601String(),
         }
       ],
     });

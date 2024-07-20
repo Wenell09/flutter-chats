@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 class RoomChatController extends GetxController {
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   late TextEditingController inputChat;
+  late ScrollController scrollController;
   late FocusNode focusNode;
   var isShowEmoji = false.obs;
   var chatId = Get.arguments["chatId"];
@@ -14,17 +15,7 @@ class RoomChatController extends GetxController {
   var photoTarget = Get.arguments["photoTarget"];
   var emailUser = Get.arguments["emailUser"];
   var emailTarget = Get.arguments["emailTarget"];
-  @override
-  void onInit() {
-    focusNode = FocusNode();
-    focusNode.addListener(() {
-      if (focusNode.hasFocus) {
-        isShowEmoji.value = false;
-      }
-    });
-    inputChat = TextEditingController();
-    super.onInit();
-  }
+  var resultDay = "";
 
   sendChat(String chatId, String emailUsers, String emailTarget,
       String message) async {
@@ -39,6 +30,8 @@ class RoomChatController extends GetxController {
           "penerima": emailTarget,
           "pesan": message,
           "time": DateTime.now().toIso8601String(),
+          "groupTime": DateFormat.yMMMMd("en_US")
+              .format(DateTime.parse(DateTime.now().toIso8601String())),
           "isRead": false,
         }
       ]),
@@ -79,8 +72,46 @@ class RoomChatController extends GetxController {
     return formattedTime;
   }
 
+  String formatDateTime(String timestamp) {
+    DateTime dateTime = DateTime.parse(timestamp);
+    DateTime now = DateTime.now();
+    DateTime yesterday = DateTime(now.year, now.month, now.day - 1);
+
+    if (dateTime.year == now.year &&
+        dateTime.month == now.month &&
+        dateTime.day == now.day) {
+      // Jika pesan diterima hari ini, kembalikan jam dan menit
+      resultDay = "hari ini";
+      return resultDay;
+    } else if (dateTime.year == yesterday.year &&
+        dateTime.month == yesterday.month &&
+        dateTime.day == yesterday.day) {
+      // Jika pesan diterima kemarin, kembalikan "Kemarin"
+      resultDay = "kemarin";
+      return resultDay;
+    } else {
+      // Jika pesan diterima lebih dari sehari yang lalu, kembalikan tanggal lainnya
+      return DateFormat('dd MMMM yyyy', 'id').format(dateTime);
+      // 'id' digunakan untuk bahasa Indonesia pada format nama bulan
+    }
+  }
+
+  @override
+  void onInit() {
+    focusNode = FocusNode();
+    scrollController = ScrollController();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        isShowEmoji.value = false;
+      }
+    });
+    inputChat = TextEditingController();
+    super.onInit();
+  }
+
   @override
   void dispose() {
+    scrollController.dispose();
     focusNode.dispose();
     inputChat.dispose();
     super.dispose();
