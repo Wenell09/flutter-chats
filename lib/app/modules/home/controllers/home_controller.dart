@@ -64,20 +64,19 @@ class HomeController extends GetxController {
 
     // update db user dan hapus total unreadnya
     final userDoc = await users.doc(email).get();
-    final userData = userDoc.data() as Map<String, dynamic>;
-    List<dynamic> userChats = userData['chats'];
-    List<Map<String, dynamic>> updatedUserChats = userChats.map((item) {
-      final chatItem = item as Map<String, dynamic>;
-      if (chatItem['connection'] == emailTarget) {
-        return {
-          ...chatItem,
-          "total_unread": 0,
-          "last_time": DateTime.now().toIso8601String(),
-        };
+    int totalUnread = 0;
+    List<dynamic> updatedChats = [];
+    if (userDoc.exists) {
+      List<dynamic> listChats = userDoc["chats"];
+      for (var chats in listChats) {
+        if (chats["connection"] == emailTarget) {
+          chats["total_unread"] = totalUnread;
+          chats["last_time"] = DateTime.now().toIso8601String();
+        }
+        updatedChats.add(chats);
       }
-      return chatItem;
-    }).toList();
-    await users.doc(email).update({'chats': updatedUserChats});
+    }
+    await users.doc(email).update({'chats': updatedChats});
   }
 
   @override

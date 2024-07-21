@@ -78,9 +78,6 @@ class SearchChatController extends GetxController {
         // jika belum terdaftar
         final chatDocument = await chats.add({
           "connections": [emailUser, targetUser],
-          "total_chats": 0,
-          "total_read": 0,
-          "total_unread": 0,
           "chat": [],
         });
         // Update db pengguna

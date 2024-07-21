@@ -23,20 +23,24 @@ class RoomChatController extends GetxController {
     CollectionReference users = firebaseFirestore.collection("users");
 
     // kirim pesan
-    await chats.doc(chatId).update({
-      "chat": FieldValue.arrayUnion([
-        {
-          "pengirim": emailUsers,
-          "penerima": emailTarget,
-          "pesan": message,
-          "time": DateTime.now().toIso8601String(),
-          "groupTime": DateFormat.yMMMMd("en_US")
-              .format(DateTime.parse(DateTime.now().toIso8601String())),
-          "isRead": false,
-        }
-      ]),
-    });
-    inputChat.clear();
+    if (inputChat.text != "") {
+      await chats.doc(chatId).update({
+        "chat": FieldValue.arrayUnion([
+          {
+            "pengirim": emailUsers,
+            "penerima": emailTarget,
+            "pesan": message,
+            "time": DateTime.now().toIso8601String(),
+            "groupTime": DateFormat.yMMMMd("en_US")
+                .format(DateTime.parse(DateTime.now().toIso8601String())),
+            "isRead": false,
+          }
+        ]),
+      });
+      inputChat.clear();
+    } else {
+      return "harap isi pesan";
+    }
 
     // Ambil data target untuk mendapatkan nilai total_unread saat ini
     DocumentSnapshot targetUserDoc = await users.doc(emailTarget).get();
@@ -52,15 +56,6 @@ class RoomChatController extends GetxController {
         }
         updatedChats.add(chat);
       }
-    }
-    // jika chat_id tidak ditemukan dalam array, tambahkan koneksi baru
-    if (updatedChats.every((chat) => chat['chats_id'] != chatId)) {
-      updatedChats.add({
-        "connection": emailUsers,
-        "chats_id": chatId,
-        "total_unread": 1,
-        "last_time": DateTime.now().toIso8601String(),
-      });
     }
     // update data target
     await users.doc(emailTarget).update({
