@@ -63,6 +63,24 @@ class RoomChatController extends GetxController {
     });
   }
 
+  deleteChat(String chatId, String groupTime, bool isRead, String emailTarget,
+      String pesan, String time) async {
+    CollectionReference chats = firebaseFirestore.collection("chats");
+    await chats.doc(chatId).update({
+      "chat": FieldValue.arrayRemove([
+        {
+          "groupTime": groupTime,
+          "isRead": isRead,
+          "penerima": emailTarget,
+          "pengirim": emailUser,
+          "pesan": pesan,
+          "time": time,
+        }
+      ]),
+    });
+    update();
+  }
+
   Stream<DocumentSnapshot<Map<String, dynamic>>> streamChat(String chatId) =>
       firebaseFirestore.collection("chats").doc(chatId).snapshots();
 
@@ -91,7 +109,7 @@ class RoomChatController extends GetxController {
       return resultDay;
     } else {
       // Jika pesan diterima lebih dari sehari yang lalu, kembalikan tanggal lainnya
-      return DateFormat('dd MMMM yyyy', 'id').format(dateTime);
+      return DateFormat('dd MMMM yyyy').format(dateTime);
       // 'id' digunakan untuk bahasa Indonesia pada format nama bulan
     }
   }

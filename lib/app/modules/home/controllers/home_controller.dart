@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -77,6 +78,63 @@ class HomeController extends GetxController {
       }
     }
     await users.doc(email).update({'chats': updatedChats});
+  }
+
+  deleteChats(String chatId, String emailTarget) async {
+    CollectionReference users = firebaseFirestore.collection("users");
+    CollectionReference chats = firebaseFirestore.collection("chats");
+
+    // ambil nilai totalUnread users dan target
+    final userDoc = await users.doc(email).get();
+    final targetDoc = await users.doc(emailTarget).get();
+    int totalUnreadUsers = 0;
+    int totalUnreadTarget = 0;
+    String dateTimeUser = "";
+    String dateTimeTarget = "";
+    List<dynamic> listChats = userDoc["chats"];
+    for (var chats in listChats) {
+      if (chats["connection"] == emailTarget) {
+        totalUnreadUsers = chats["total_unread"];
+        dateTimeUser = chats["last_time"];
+        debugPrint("isi total unread : $totalUnreadUsers");
+        debugPrint("isi total last time : $dateTimeUser");
+        break;
+      }
+    }
+    List<dynamic> listChatsTarget = targetDoc["chats"];
+    for (var chatsTarget in listChatsTarget) {
+      if (chatsTarget["connection"] == email) {
+        totalUnreadTarget = chatsTarget["total_unread"];
+        dateTimeTarget = chatsTarget["last_time"];
+        debugPrint("isi total unread : $totalUnreadTarget");
+        debugPrint("isi total last time : $dateTimeTarget");
+        break;
+      }
+    }
+
+    // hapus doc sesuai id di collection chat
+    await chats.doc(chatId).delete();
+    // perbarui data users dan target
+    await users.doc(email).update({
+      "chats": FieldValue.arrayRemove([
+        {
+          "connection": emailTarget,
+          "chats_id": chatId,
+          "total_unread": totalUnreadUsers,
+          "last_time": dateTimeUser,
+        }
+      ]),
+    });
+    await users.doc(emailTarget).update({
+      "chats": FieldValue.arrayRemove([
+        {
+          "connection": email,
+          "chats_id": chatId,
+          "total_unread": totalUnreadTarget,
+          "last_time": dateTimeTarget,
+        }
+      ]),
+    });
   }
 
   @override
