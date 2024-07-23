@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_apps/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter_chat_apps/app/modules/profile/controllers/profile_controller.dart';
 import 'package:get/get.dart';
 import '../controllers/change_profile_controller.dart';
@@ -9,6 +11,7 @@ class ChangeProfileView extends GetView<ChangeProfileController> {
   @override
   Widget build(BuildContext context) {
     final update = Get.find<ProfileController>();
+    final updateHome = Get.find<HomeController>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Change Profile'),
@@ -25,23 +28,27 @@ class ChangeProfileView extends GetView<ChangeProfileController> {
             glowCount: 1,
             glowColor: Colors.black,
             duration: const Duration(seconds: 2),
-            child: Hero(
-              tag: controller.photoUrl,
-              child: Container(
-                width: 125,
-                height: 125,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(
-                      controller.photoUrl,
+            child: Obx(
+              () => Hero(
+                tag: controller.id,
+                child: Container(
+                  width: 125,
+                  height: 125,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        (controller.updatedPhotoUrl.value.isEmpty)
+                            ? controller.photoUrl
+                            : controller.updatedPhotoUrl.value,
+                      ),
+                      fit: BoxFit.contain,
                     ),
-                    fit: BoxFit.contain,
-                  ),
-                  shape: BoxShape.circle,
-                  color: Colors.grey,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 5,
+                    shape: BoxShape.circle,
+                    color: Colors.grey,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 5,
+                    ),
                   ),
                 ),
               ),
@@ -84,17 +91,42 @@ class ChangeProfileView extends GetView<ChangeProfileController> {
           const SizedBox(
             height: 20,
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 30),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("No image"),
-                Text(
-                  "Choosen",
-                  style: TextStyle(color: Colors.blue),
-                ),
-              ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Obx(
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  (controller.isPickImage.value)
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: Image.file(
+                            File(
+                              controller.image!.path,
+                            ),
+                            fit: BoxFit.cover,
+                            width: 100,
+                            height: 100,
+                          ),
+                        )
+                      : const Text("No image"),
+                  (controller.isPickImage.value)
+                      ? InkWell(
+                          onTap: () => controller.deleteImage(),
+                          child: const Text(
+                            "Delete Image",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        )
+                      : InkWell(
+                          onTap: () => controller.pickImage(),
+                          child: const Text(
+                            "Choosen",
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ),
+                ],
+              ),
             ),
           ),
           const SizedBox(
@@ -105,6 +137,10 @@ class ChangeProfileView extends GetView<ChangeProfileController> {
               onTap: () {
                 controller.changeProfile(
                     controller.inputName.text, controller.inputStatus.text);
+                if (controller.isPickImage.value) {
+                  controller.uploadImage(controller.id);
+                }
+                controller.isPickImage.value = false;
                 showDialog(
                   barrierDismissible: false,
                   context: context,
@@ -131,8 +167,9 @@ class ChangeProfileView extends GetView<ChangeProfileController> {
                   },
                 );
                 Future.delayed(const Duration(seconds: 2), () {
-                  update.updateUser(
-                      controller.inputName.text, controller.photoUrl);
+                  update.updateUser(controller.inputName.text,
+                      controller.updatedPhotoUrl.value);
+                  updateHome.updatePhoto(controller.updatedPhotoUrl.value);
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 });

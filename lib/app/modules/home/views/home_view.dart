@@ -28,18 +28,22 @@ class HomeView extends GetView<HomeController> {
               highlightColor: Colors.transparent,
               onTap: () =>
                   Navigator.of(context).pushNamed(Routes.PROFILE, arguments: {
+                "id": controller.id,
                 "email": controller.email,
                 "name": controller.name,
-                "photo": controller.photo,
+                "photo": (controller.photoUser.value.isEmpty)
+                    ? controller.photo
+                    : controller.photoUser.value,
                 "status": controller.status,
               }),
               child: Obx(
                 () => (controller.photoUser.value.isEmpty)
-                    ? const CircleAvatar(
+                    ? CircleAvatar(
                         backgroundColor: Colors.black,
+                        backgroundImage: NetworkImage(controller.photo),
                       )
                     : Hero(
-                        tag: controller.photoUser.value,
+                        tag: controller.id,
                         child: CircleAvatar(
                           backgroundColor: Colors.black,
                           backgroundImage:

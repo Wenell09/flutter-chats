@@ -1,3 +1,4 @@
+import 'package:flutter_chat_apps/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter_chat_apps/app/modules/profile/controllers/profile_controller.dart';
 import 'package:get/get.dart';
 
@@ -11,6 +12,9 @@ class ChangeProfileBinding extends Bindings {
     );
     Get.lazyPut<ProfileController>(
       () => ProfileController(),
+    );
+    Get.lazyPut<HomeController>(
+      () => HomeController(),
     );
   }
 }

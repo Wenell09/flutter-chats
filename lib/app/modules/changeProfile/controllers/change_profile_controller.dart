@@ -1,15 +1,25 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChangeProfileController extends GetxController {
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   late TextEditingController inputName;
   late TextEditingController inputStatus;
+  var id = Get.arguments["id"];
   var email = Get.arguments["email"];
   var photoUrl = Get.arguments["photoUrl"];
+  var updatedPhotoUrl = "".obs;
   var name = Get.arguments["name"];
   var status = Get.arguments["status"];
+  final ImagePicker picker = ImagePicker();
+  XFile? image;
+  final isPickImage = false.obs;
 
   changeProfile(String getName, String getStatus) async {
     CollectionReference users = firebaseFirestore.collection("users");
@@ -26,6 +36,36 @@ class ChangeProfileController extends GetxController {
     final getDataUser = dataUser.data() as Map<String, dynamic>;
     inputName.text = getDataUser["name"];
     inputStatus.text = getDataUser["status"];
+  }
+
+  pickImage() async {
+    final imagePicker = await picker.pickImage(source: ImageSource.gallery);
+    if (imagePicker != null) {
+      image = imagePicker;
+      isPickImage.value = true;
+    }
+  }
+
+  uploadImage(String id) async {
+    CollectionReference users = firebaseFirestore.collection("users");
+    Reference reference = firebaseStorage.ref("$id.png");
+    File file = File(image!.path);
+    try {
+      await reference.putFile(file);
+      final dataImage = await reference.getDownloadURL();
+      await users.doc(email).update({
+        "photoUrl": dataImage,
+        "updatedAccount": DateTime.now().toIso8601String()
+      });
+      updatedPhotoUrl.value = dataImage;
+    } catch (e) {
+      debugPrint("error :$e");
+    }
+  }
+
+  deleteImage() {
+    isPickImage.value = false;
+    image = null;
   }
 
   @override

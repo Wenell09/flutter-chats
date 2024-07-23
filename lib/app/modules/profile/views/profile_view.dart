@@ -99,6 +99,7 @@ class ProfileView extends GetView<ProfileController> {
                 InkWell(
                   onTap: () => Navigator.of(context)
                       .pushNamed(Routes.CHANGE_PROFILE, arguments: {
+                    "id": controller.id,
                     "email": controller.emailUser,
                     "name": controller.nameUser,
                     "photoUrl": controller.photoUser,
@@ -259,23 +260,27 @@ class ProfileView extends GetView<ProfileController> {
                 glowCount: 1,
                 glowColor: Colors.black,
                 duration: const Duration(seconds: 2),
-                child: Hero(
-                  tag: controller.photoUser,
-                  child: Container(
-                    width: 125,
-                    height: 125,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          controller.photoUser,
+                child: Obx(
+                  () => Hero(
+                    tag: controller.id,
+                    child: Container(
+                      width: 125,
+                      height: 125,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            (controller.updatePhotoUser.value.isEmpty)
+                                ? controller.photoUser
+                                : controller.updatePhotoUser.value,
+                          ),
+                          fit: BoxFit.cover,
                         ),
-                        fit: BoxFit.cover,
-                      ),
-                      shape: BoxShape.circle,
-                      color: Colors.grey,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 5,
+                        shape: BoxShape.circle,
+                        color: Colors.grey,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 5,
+                        ),
                       ),
                     ),
                   ),

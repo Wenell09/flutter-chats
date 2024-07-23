@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 class HomeController extends GetxController {
   var photoUser = "".obs;
+  var id = Get.arguments["id"];
   var photo = Get.arguments["photo"];
   var email = Get.arguments["email"];
   var name = Get.arguments["name"];
@@ -14,14 +15,25 @@ class HomeController extends GetxController {
 
   savePhoto() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    photoUser.value = photo;
-    prefs.setString("photo", photo);
+    if (photoUser.value.isEmpty) {
+      prefs.setString("photo", photo);
+    } else {
+      prefs.setString("photo", photoUser.value);
+    }
   }
 
   getPhoto() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final photoPrefs = prefs.getString("photo") ?? "";
-    photoUser.value = photoPrefs;
+    if (photoUser.value.isEmpty) {
+      photo = photoPrefs;
+    } else {
+      photoUser.value = photoPrefs;
+    }
+  }
+
+  updatePhoto(String photo) {
+    photoUser.value = photo;
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> streamChat(String email) =>

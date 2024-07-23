@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ProfileController extends GetxController {
   var updateNameUser = "".obs;
   var updatePhotoUser = "".obs;
+  var id = Get.arguments["id"];
   var nameUser = Get.arguments["name"];
   var emailUser = Get.arguments["email"];
   var photoUser = Get.arguments["photo"];
@@ -34,7 +35,7 @@ class ProfileController extends GetxController {
     var photo = prefs.getString('photoUrl') ?? "";
     var status = prefs.getString('status') ?? "";
     updateNameUser.value = name;
-    updatePhotoUser.value = email;
+    updatePhotoUser.value = photo;
     nameUser = name;
     emailUser = email;
     photoUser = photo;
