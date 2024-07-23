@@ -15,25 +15,20 @@ class HomeController extends GetxController {
 
   savePhoto() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (photoUser.value.isEmpty) {
-      prefs.setString("photo", photo);
-    } else {
-      prefs.setString("photo", photoUser.value);
-    }
+    prefs.setString("photo", photo);
   }
 
   getPhoto() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final photoPrefs = prefs.getString("photo") ?? "";
-    if (photoUser.value.isEmpty) {
-      photo = photoPrefs;
-    } else {
-      photoUser.value = photoPrefs;
-    }
+    photo = photoPrefs;
+    photoUser.value = photoPrefs;
   }
 
-  updatePhoto(String photo) {
+  updatePhoto(String photo) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     photoUser.value = photo;
+    prefs.setString('photo', photo);
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> streamChat(String email) =>

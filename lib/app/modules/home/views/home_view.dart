@@ -31,25 +31,21 @@ class HomeView extends GetView<HomeController> {
                 "id": controller.id,
                 "email": controller.email,
                 "name": controller.name,
-                "photo": (controller.photoUser.value.isEmpty)
-                    ? controller.photo
-                    : controller.photoUser.value,
+                "photo": controller.photo,
                 "status": controller.status,
               }),
               child: Obx(
-                () => (controller.photoUser.value.isEmpty)
-                    ? CircleAvatar(
-                        backgroundColor: Colors.black,
-                        backgroundImage: NetworkImage(controller.photo),
-                      )
-                    : Hero(
-                        tag: controller.id,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.black,
-                          backgroundImage:
-                              NetworkImage(controller.photoUser.value),
-                        ),
-                      ),
+                () => Hero(
+                  tag: controller.id,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.black,
+                    backgroundImage: NetworkImage(
+                      (controller.photoUser.value.isEmpty)
+                          ? controller.photo
+                          : controller.photoUser.value,
+                    ),
+                  ),
+                ),
               ),
             ),
           )

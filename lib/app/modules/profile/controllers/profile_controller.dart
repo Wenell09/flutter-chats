@@ -20,8 +20,6 @@ class ProfileController extends GetxController {
 
   setDataUser() async {
     final prefs = await SharedPreferences.getInstance();
-    updateNameUser.value = nameUser;
-    updatePhotoUser.value = photoUser;
     prefs.setString('name', nameUser);
     prefs.setString('email', emailUser);
     prefs.setString('photoUrl', photoUser);
@@ -42,9 +40,12 @@ class ProfileController extends GetxController {
     statusUser = status;
   }
 
-  updateUser(String name, String photo) {
+  updateUser(String name, String photo) async {
+    final prefs = await SharedPreferences.getInstance();
     updateNameUser.value = name;
     updatePhotoUser.value = photo;
+    prefs.setString('name', name);
+    prefs.setString('photoUrl', photo);
   }
 
   @override
