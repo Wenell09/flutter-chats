@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_apps/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter_chat_apps/app/modules/profile/controllers/profile_controller.dart';
@@ -36,10 +37,8 @@ class ChangeProfileView extends GetView<ChangeProfileController> {
                   height: 125,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(
-                        (controller.updatedPhotoUrl.value.isEmpty)
-                            ? controller.photoUrl
-                            : controller.updatedPhotoUrl.value,
+                      image: ExtendedNetworkImageProvider(
+                        controller.updatedPhotoUrl.value,
                       ),
                       fit: BoxFit.contain,
                     ),
@@ -169,6 +168,7 @@ class ChangeProfileView extends GetView<ChangeProfileController> {
                 Future.delayed(const Duration(seconds: 2), () {
                   update.updateUser(controller.inputName.text,
                       controller.updatedPhotoUrl.value);
+                  update.getUpdatePhoto();
                   updateHome.updatePhoto(controller.updatedPhotoUrl.value);
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();

@@ -13,10 +13,9 @@ class ChangeProfileController extends GetxController {
   late TextEditingController inputStatus;
   var id = Get.arguments["id"];
   var email = Get.arguments["email"];
-  var photoUrl = Get.arguments["photoUrl"];
-  var updatedPhotoUrl = "".obs;
   var name = Get.arguments["name"];
   var status = Get.arguments["status"];
+  var updatedPhotoUrl = "".obs;
   final ImagePicker picker = ImagePicker();
   XFile? image;
   final isPickImage = false.obs;
@@ -36,6 +35,7 @@ class ChangeProfileController extends GetxController {
     final getDataUser = dataUser.data() as Map<String, dynamic>;
     inputName.text = getDataUser["name"];
     inputStatus.text = getDataUser["status"];
+    updatedPhotoUrl.value = getDataUser["photoUrl"];
   }
 
   pickImage() async {

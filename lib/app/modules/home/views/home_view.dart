@@ -30,8 +30,6 @@ class HomeView extends GetView<HomeController> {
                   Navigator.of(context).pushNamed(Routes.PROFILE, arguments: {
                 "id": controller.id,
                 "email": controller.email,
-                "name": controller.name,
-                "photo": controller.photo,
                 "status": controller.status,
               }),
               child: Obx(

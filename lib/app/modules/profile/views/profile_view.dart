@@ -1,4 +1,5 @@
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_apps/app/modules/login/controllers/login_controller.dart';
 import 'package:flutter_chat_apps/app/routes/app_pages.dart';
@@ -101,8 +102,7 @@ class ProfileView extends GetView<ProfileController> {
                       .pushNamed(Routes.CHANGE_PROFILE, arguments: {
                     "id": controller.id,
                     "email": controller.emailUser,
-                    "name": controller.nameUser,
-                    "photoUrl": controller.photoUser,
+                    "name": controller.updateNameUser.value,
                     "status": controller.statusUser,
                   }),
                   child: const ListTile(
@@ -268,10 +268,8 @@ class ProfileView extends GetView<ProfileController> {
                       height: 125,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(
-                            (controller.updatePhotoUser.value.isEmpty)
-                                ? controller.photoUser
-                                : controller.updatePhotoUser.value,
+                          image: ExtendedNetworkImageProvider(
+                            controller.updatePhotoUser.value,
                           ),
                           fit: BoxFit.cover,
                         ),

@@ -22,7 +22,6 @@ class HomeController extends GetxController {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final photoPrefs = prefs.getString("photo") ?? "";
     photo = photoPrefs;
-    photoUser.value = photoPrefs;
   }
 
   updatePhoto(String photo) async {
