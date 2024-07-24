@@ -22,7 +22,7 @@ class SplashView extends GetView<SplashController> {
           children: [
             Lottie.asset("assets/splash-chat.json", width: 300, height: 300),
             const Text(
-              'Welcome To Chat Apps',
+              'Welcome To NelChats',
               style: TextStyle(fontSize: 20),
             ),
           ],

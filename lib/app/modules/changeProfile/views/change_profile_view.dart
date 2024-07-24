@@ -55,9 +55,10 @@ class ChangeProfileView extends GetView<ChangeProfileController> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-            child: TextField(
+            child: TextFormField(
               controller: controller.inputName,
               cursorColor: Colors.black,
+              textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(
                 labelText: "Name",
                 labelStyle: TextStyle(color: Colors.black),

@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Chat Apps",
+      title: "NelChats",
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
     );
